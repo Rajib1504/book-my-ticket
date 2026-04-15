@@ -3,11 +3,13 @@ import pg from "pg";
 const dbPort = Number(process.env.DB_PORT || 5433);
 
 const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
   host: process.env.DB_HOST || "127.0.0.1",
   port: Number.isNaN(dbPort) ? 5433 : dbPort,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "postgres",
   database: process.env.DB_NAME || "sql_class_2_db",
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
   max: 20,
   connectionTimeoutMillis: 2000,
   idleTimeoutMillis: 30000,
