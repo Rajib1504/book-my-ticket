@@ -38,13 +38,20 @@ const app = new express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
+
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
+
 //get all seats
 app.get("/seats", async (req, res) => {
-  const result = await pool.query("select * from seats"); // equivalent to Seats.find() in mongoose
-  res.send(result.rows);
+  try {
+    const result = await pool.query("select * from seats");
+    res.send(result.rows);
+  } catch (error) {
+    console.log(error);
+    res.send(500);
+  }
 });
 
 //book a seat give the seatId and your name
