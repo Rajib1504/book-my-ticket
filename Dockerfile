@@ -1,20 +1,20 @@
-# Base image is Node.js 
-FROM node:18-alpine
+# Base image is Node.js
+FROM node:20-alpine
 
-#  working directory inside Container 
+# Working directory inside container
 WORKDIR /app
 
-# copy package.json and  package-lock.json 
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Dependencies install
+# Install production dependencies
 RUN npm install
 
-# copy all code
+# Copy all source code
 COPY . .
 
-# port number
+# Port exposed by the app
 EXPOSE 8080
 
-# start comand
-CMD ["npm", "run", "dev"]
+# Start the server (uses node directly — no nodemon)
+CMD ["npm", "start"]
