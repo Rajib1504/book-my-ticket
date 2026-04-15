@@ -7,10 +7,13 @@
 // SELECT 0 FROM generate_series(1, 20);
 
 import express from "express";
-import pg from "pg";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
+import authRouter from "./src/module/auth/auth.route.js";
+import pool, { initDB } from "./src/common/config/db.config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -33,7 +36,8 @@ const port = process.env.PORT || 8080;
 
 const app = new express();
 app.use(cors());
-
+app.use(express.json());
+app.use("/api/auth", authRouter);
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
@@ -82,5 +86,8 @@ app.put("/:id/:name", async (req, res) => {
     res.send(500);
   }
 });
-
-app.listen(port, () => console.log("Server starting on port: " + port));
+initDB()
+  .then(() => {
+    app.listen(port, () => console.log("Server starting on port: " + port));
+  })
+  .catch((err) => console.error("Failed to initialize database", err));
