@@ -14,6 +14,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=sql_class_2_db
+      - JWT_ACCESS_SECRET=change_this_to_a_strong_secret
+      - JWT_ACCESS_EXPIRES_IN=15m
     volumes:
       - .:/app
       - /app/node_modules

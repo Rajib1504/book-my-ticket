@@ -3,139 +3,1311 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stellar Seat Booking</title>
+    <title>Stellar Seat Booking | ChaiCode Cinema</title>
+    <meta
+      name="description"
+      content="Book your premium cinema seats at ChaiCode Cinema – experience blockbusters in style."
+    />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap");
+      :root {
+        --brand-primary: #a855f7;
+        --brand-secondary: #ec4899;
+        --brand-accent: #f59e0b;
+        --surface-1: #0d0a1a;
+        --surface-2: #130d26;
+        --surface-3: #1a1033;
+        --glass-bg: rgba(26, 16, 51, 0.75);
+        --glass-border: rgba(168, 85, 247, 0.18);
+        --seat-available: #a855f7;
+        --seat-booked: #1a0a0a;
+        --text-primary: #f1e6ff;
+        --text-secondary: #9d88c2;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         font-family: "Outfit", sans-serif;
-        background-color: #0f172a;
-        color: #f8fafc;
+        background-color: var(--surface-1);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* ─── Animated Background ─── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 20% 10%,
+            rgba(168, 85, 247, 0.18) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 50% at 80% 80%,
+            rgba(236, 72, 153, 0.12) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 50% 40% at 50% 50%,
+            rgba(245, 158, 11, 0.04) 0%,
+            transparent 70%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ─── Glass Card ─── */
+      .glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+      }
+
+      /* ─── Form Transitions ─── */
+      .hidden-content {
+        display: none;
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+      .visible-content {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ─── Input Fields ─── */
+      .input-field {
+        background: rgba(13, 10, 26, 0.7);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+        color: #f1e6ff;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        font-family: "Outfit", sans-serif;
+        font-size: 0.95rem;
+      }
+      .input-field::placeholder {
+        color: rgba(157, 136, 194, 0.5);
+      }
+      .input-field:focus {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        outline: none;
+      }
+
+      /* ─── Primary Button ─── */
+      .btn-primary {
+        width: 100%;
+        padding: 0.9rem;
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease,
+          opacity 0.15s ease;
+        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
+        letter-spacing: 0.02em;
+        font-family: "Outfit", sans-serif;
+      }
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(168, 85, 247, 0.45);
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ─── Fade In ─── */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-fade-in {
+        animation: fadeInUp 0.6s ease forwards;
+      }
+
+      /* ─── Seat Styles ─── */
+      .seat {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          background 0.18s ease;
+        cursor: pointer;
+        position: relative;
+        select: none;
+      }
+      @media (min-width: 768px) {
+        .seat {
+          width: 70px;
+          height: 70px;
+          font-size: 1.1rem;
+          border-radius: 14px;
+        }
+      }
+
+      .seat-available {
+        background: rgba(168, 85, 247, 0.12);
+        border: 1.5px solid rgba(168, 85, 247, 0.4);
+        color: #c084fc;
+      }
+      .seat-available:hover {
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-3px) scale(1.06);
+        box-shadow: 0 12px 28px rgba(168, 85, 247, 0.5);
+        z-index: 2;
+      }
+      .seat-available:active {
+        transform: scale(0.95);
+      }
+
+      .seat-booked {
+        background: rgba(20, 6, 6, 0.85);
+        border: 1.5px solid rgba(180, 30, 30, 0.25);
+        color: rgba(255, 255, 255, 0.18);
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.55;
+        /* diagonal slash overlay */
+        overflow: hidden;
+      }
+      .seat-booked::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 5px,
+          rgba(180, 30, 30, 0.18) 5px,
+          rgba(180, 30, 30, 0.18) 6px
+        );
+        border-radius: inherit;
+        pointer-events: none;
+      }
+      /* re-enable tooltip hover even on booked seats */
+      .seat-booked.has-tooltip {
+        pointer-events: auto;
+        cursor: default;
+      }
+
+      /* ─── Tooltip (Fixed: no clipping) ─── */
+      .seat-tooltip {
+        position: fixed; /* Fixed so it is never clipped by overflow */
+        background: #1a1033;
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        color: #f1e6ff;
+        font-size: 0.75rem;
+        padding: 7px 14px;
+        border-radius: 10px;
+        white-space: nowrap;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(4px);
+        transition:
+          opacity 0.18s ease,
+          transform 0.18s ease;
+        z-index: 9999;
+      }
+      .seat-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: rgba(168, 85, 247, 0.35);
+      }
+      .seat-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ─── Screen Glow ─── */
+      .screen-bar {
+        height: 6px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          #a855f7,
+          #ec4899,
+          #a855f7,
+          transparent
+        );
+        border-radius: 3px;
+        position: relative;
+      }
+      .screen-bar::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        background: inherit;
+        filter: blur(10px);
+        opacity: 0.5;
+        border-radius: 6px;
+      }
+
+      /* ─── Legend Pill ─── */
+      .legend-pill {
+        background: rgba(13, 10, 26, 0.6);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 999px;
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        font-size: 0.9rem;
+      }
+      .divider-v {
+        width: 1px;
+        height: 22px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* ─── Header Logout Button ─── */
+      .btn-logout {
+        padding: 8px 22px;
+        border-radius: 999px;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: "Outfit", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-logout:hover {
+        background: rgba(168, 85, 247, 0.12);
+        border-color: rgba(168, 85, 247, 0.55);
+        color: #c084fc;
+      }
+
+      /* ═══════════════════════════════════════
+         MODAL SYSTEM
+      ═══════════════════════════════════════ */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 1rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s ease;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      @keyframes modalOut {
+        from {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+      }
+
+      .modal-card {
+        background: #1a1033;
+        border: 1px solid rgba(168, 85, 247, 0.25);
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow:
+          0 24px 80px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(168, 85, 247, 0.08);
+        animation: modalIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      .modal-card.closing {
+        animation: modalOut 0.4s ease forwards;
+      }
+
+      .modal-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.2rem;
+        font-size: 1.6rem;
+      }
+      .modal-icon.error {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1.5px solid rgba(239, 68, 68, 0.3);
+      }
+      .modal-icon.success {
+        background: rgba(168, 85, 247, 0.12);
+        border: 1.5px solid rgba(168, 85, 247, 0.3);
+      }
+      .modal-icon.confirm {
+        background: rgba(245, 158, 11, 0.12);
+        border: 1.5px solid rgba(245, 158, 11, 0.3);
+      }
+      .modal-icon.info {
+        background: rgba(99, 179, 237, 0.12);
+        border: 1.5px solid rgba(99, 179, 237, 0.3);
+      }
+
+      .modal-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #f1e6ff;
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      .modal-body {
+        font-size: 0.92rem;
+        color: var(--text-secondary);
+        text-align: center;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .modal-btn {
+        padding: 10px 28px;
+        border-radius: 12px;
+        font-family: "Outfit", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        border: none;
+      }
+      .modal-btn-primary {
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        color: white;
+        box-shadow: 0 6px 18px rgba(168, 85, 247, 0.35);
+        flex: 1;
+      }
+      .modal-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(168, 85, 247, 0.45);
+      }
+      .modal-btn-secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-secondary);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        flex: 1;
+      }
+      .modal-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f1e6ff;
+      }
+
+      /* ─── Booking Confirm Card Details ─── */
+      .confirm-detail {
+        background: rgba(168, 85, 247, 0.07);
+        border: 1px solid rgba(168, 85, 247, 0.15);
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .confirm-detail-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+      .confirm-detail-label {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+      }
+      .confirm-detail-value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f1e6ff;
+      }
+
+      /* Sparkle shimmer on success */
+      @keyframes shimmer {
+        0% {
+          background-position: -200% center;
+        }
+        100% {
+          background-position: 200% center;
+        }
+      }
+      .shimmer-text {
+        background: linear-gradient(
+          90deg,
+          #a855f7 0%,
+          #f9a8d4 40%,
+          #a855f7 80%
+        );
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 2.5s linear infinite;
+      }
+
+      /* ─── Ticket Row in Table ─── */
+      td {
+        padding: 5px;
+      }
+      @media (min-width: 640px) {
+        td {
+          padding: 8px;
+        }
+      }
+
+      /* ─── Loading spinner on seats ─── */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(168, 85, 247, 0.15);
+        border-top-color: #a855f7;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+        margin: auto;
+      }
+
+      /* ─── Auth link ─── */
+      .auth-link {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: "Outfit", sans-serif;
+        color: #c084fc;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        font-size: inherit;
+        padding: 0;
+      }
+      .auth-link:hover {
+        color: #e879f9;
+      }
+
+      /* scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(168, 85, 247, 0.3);
+        border-radius: 6px;
       }
     </style>
   </head>
-  <body
-    class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-  >
+
+  <body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <!-- ══════════════════ GLOBAL TOOLTIP ══════════════════ -->
+    <div id="global-tooltip" class="seat-tooltip"></div>
+
+    <!-- ══════════════════ MODAL OVERLAY ══════════════════ -->
     <div
-      class="max-w-7xl w-full bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-slate-700/50"
+      id="modal-overlay"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
     >
-      <div class="text-center mb-10">
-        <h1
-          class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-4 tracking-tight"
-        >
-          ChaiCode Cinema - Now Showing<br />
-          <br />
-          <span class="text-red-400">
-            <span class="font-bold">Dhurandhar The Revenge</span>
-          </span>
-        </h1>
-        <p class="text-slate-400 text-lg">Jassi ko ghar ki yaad kyu nhi aai?</p>
-      </div>
-
-      <div class="flex justify-center mb-10">
-        <div
-          class="bg-slate-900/50 rounded-full px-6 py-3 border border-slate-700 flex gap-8 items-center"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              class="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]"
-            ></div>
-            <span class="text-slate-300 font-medium tracking-wide"
-              >Available</span
-            >
-          </div>
-          <div class="w-px h-6 bg-slate-700"></div>
-          <div class="flex items-center gap-3">
-            <div
-              class="w-4 h-4 rounded-full bg-rose-500/20 border border-rose-500/50"
-            ></div>
-            <span class="text-slate-400 font-medium tracking-wide">Booked</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-center">
-        <div
-          class="bg-slate-900/40 p-8 rounded-2xl border border-slate-700/50 shadow-inner"
-        >
-          <table
-            id="tbl"
-            class="border-separate border-spacing-4 mx-auto"
-          ></table>
-        </div>
+      <div id="modal-card" class="modal-card">
+        <div id="modal-icon" class="modal-icon"></div>
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-body" class="modal-body"></div>
+        <div id="modal-actions" class="modal-actions"></div>
       </div>
     </div>
 
+    <!-- ══════════════════ AUTH GATE ══════════════════ -->
+    <div
+      id="auth-gate"
+      class="max-w-md w-full glass rounded-3xl p-8 shadow-2xl animate-fade-in"
+    >
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-4">
+          <span style="font-size: 2rem">🎬</span>
+        </div>
+        <h1
+          class="text-3xl font-extrabold mb-2"
+          style="
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          "
+        >
+          ChaiCode Cinema
+        </h1>
+        <p id="auth-title" class="text-sm" style="color: var(--text-secondary)">
+          Welcome! Please login to enter the cinema.
+        </p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label
+            class="block text-sm font-medium mb-1.5 ml-1"
+            style="color: var(--text-secondary)"
+            for="login-email"
+            >Email address</label
+          >
+          <input
+            type="email"
+            id="login-email"
+            required
+            class="input-field"
+            placeholder="john@example.com"
+            autocomplete="email"
+          />
+        </div>
+        <div>
+          <label
+            class="block text-sm font-medium mb-1.5 ml-1"
+            style="color: var(--text-secondary)"
+            for="login-password"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="login-password"
+            required
+            class="input-field"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+        </div>
+        <button id="login-btn" type="submit" class="btn-primary mt-4">
+          Login
+        </button>
+        <p
+          class="text-center text-sm mt-5"
+          style="color: var(--text-secondary)"
+        >
+          Don't have an account?
+          <button
+            type="button"
+            onclick="switchAuth('register')"
+            class="auth-link"
+          >
+            Register now
+          </button>
+        </p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="space-y-4 hidden-content">
+        <div>
+          <label
+            class="block text-sm font-medium mb-1.5 ml-1"
+            style="color: var(--text-secondary)"
+            for="reg-name"
+            >Full Name</label
+          >
+          <input
+            type="text"
+            id="reg-name"
+            required
+            class="input-field"
+            placeholder="John Doe"
+            autocomplete="name"
+          />
+        </div>
+        <div>
+          <label
+            class="block text-sm font-medium mb-1.5 ml-1"
+            style="color: var(--text-secondary)"
+            for="reg-email"
+            >Email address</label
+          >
+          <input
+            type="email"
+            id="reg-email"
+            required
+            class="input-field"
+            placeholder="john@example.com"
+            autocomplete="email"
+          />
+        </div>
+        <div>
+          <label
+            class="block text-sm font-medium mb-1.5 ml-1"
+            style="color: var(--text-secondary)"
+            for="reg-password"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="reg-password"
+            required
+            class="input-field"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+        </div>
+        <button id="register-btn" type="submit" class="btn-primary mt-4">
+          Create Account
+        </button>
+        <p
+          class="text-center text-sm mt-5"
+          style="color: var(--text-secondary)"
+        >
+          Already have an account?
+          <button type="button" onclick="switchAuth('login')" class="auth-link">
+            Log in
+          </button>
+        </p>
+      </form>
+    </div>
+
+    <!-- ══════════════════ CINEMA VIEW ══════════════════ -->
+    <div id="cinema-view" class="max-w-5xl w-full hidden-content">
+      <!-- Header -->
+      <header class="flex justify-between items-center mb-8 px-2">
+        <div>
+          <h1
+            class="text-2xl font-extrabold text-white flex items-center gap-2"
+          >
+            🎬 <span>ChaiCode Cinema</span>
+          </h1>
+          <p
+            id="user-welcome"
+            class="text-sm font-medium mt-0.5"
+            style="color: #c084fc"
+          ></p>
+        </div>
+        <button id="logout-btn" onclick="logout()" class="btn-logout">
+          Logout
+        </button>
+      </header>
+
+      <!-- Main Card -->
+      <div
+        class="glass rounded-3xl shadow-2xl p-6 md:p-10"
+        style="border: 1px solid rgba(168, 85, 247, 0.2)"
+      >
+        <!-- Movie Title -->
+        <div class="text-center mb-10">
+          <p
+            class="text-xs uppercase tracking-widest mb-3"
+            style="color: var(--text-secondary)"
+          >
+            Now Showing
+          </p>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-6">
+            <span class="shimmer-text">Dhurandhar The Revenge</span>
+          </h2>
+
+          <!-- Screen -->
+          <div class="max-w-xs mx-auto mb-1">
+            <div class="screen-bar"></div>
+          </div>
+          <p
+            class="text-xs uppercase tracking-widest mt-3"
+            style="color: var(--text-secondary)"
+          >
+            SCREEN THIS SIDE
+          </p>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex justify-center mb-8">
+          <div class="legend-pill">
+            <div class="flex items-center gap-2.5">
+              <div
+                class="w-4 h-4 rounded"
+                style="
+                  background: rgba(168, 85, 247, 0.5);
+                  border: 1.5px solid rgba(168, 85, 247, 0.6);
+                "
+              ></div>
+              <span style="color: var(--text-secondary); font-weight: 500"
+                >Available</span
+              >
+            </div>
+            <div class="divider-v"></div>
+            <div class="flex items-center gap-2.5">
+              <div
+                class="w-4 h-4 rounded"
+                style="
+                  background: var(--seat-booked);
+                  border: 1.5px solid rgba(255, 255, 255, 0.06);
+                "
+              ></div>
+              <span style="color: var(--text-secondary); font-weight: 500"
+                >Booked</span
+              >
+            </div>
+            <div class="divider-v"></div>
+            <div class="flex items-center gap-2.5" id="seats-count-wrapper">
+              <span
+                id="available-count"
+                style="color: #c084fc; font-weight: 700"
+                >–</span
+              >
+              <span style="color: var(--text-secondary); font-weight: 500"
+                >seats left</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Seat Grid (NOTE: no overflow-hidden so tooltips aren't clipped) -->
+        <div class="overflow-x-auto pb-6" style="overflow: visible">
+          <div class="flex justify-center">
+            <!-- Loading state -->
+            <div id="seats-loading" class="py-16 px-8">
+              <div class="spinner mb-4"></div>
+              <p
+                class="text-center text-sm"
+                style="color: var(--text-secondary)"
+              >
+                Loading seats…
+              </p>
+            </div>
+            <!-- Seat table -->
+            <table
+              id="tbl"
+              class="border-separate"
+              style="border-spacing: 6px; display: none"
+            ></table>
+          </div>
+        </div>
+      </div>
+
+      <p
+        class="text-center text-xs mt-6"
+        style="color: rgba(157, 136, 194, 0.4)"
+      >
+        © 2026 ChaiCode Cinema. All seats are reserved per session.
+      </p>
+    </div>
+
     <script>
-      async function run() {
-        const tbl = document.getElementById("tbl");
-        const res = await fetch("/seats");
-        const resarray = await res.json();
-        const j = resarray.sort((a, b) => a.id - b.id);
-        let tr;
-        for (let i = 0; i < j.length; i++) {
-          if (i % 8 === 0) tr = document.createElement("tr");
+      /* ══════════════════════════════════════════════════
+         CONFIG
+      ══════════════════════════════════════════════════ */
+      const API_BASE = "/api/auth";
+      const STORAGE_KEY = "cinema_auth";
 
-          const td = document.createElement("td");
+      /* ══════════════════════════════════════════════════
+         MODAL SYSTEM  (replaces all alert / confirm)
+      ══════════════════════════════════════════════════ */
+      const ICONS = {
+        error: "❌",
+        success: "✅",
+        confirm: "🎟️",
+        info: "ℹ️",
+      };
 
-          // Base aesthetic classes - added 'relative group' for tooltip positioning
-          const baseClasses =
-            "w-32 h-32 rounded-2xl text-center align-middle text-2xl font-bold transition-all duration-300 select-none relative group";
+      function openModal({ type = "info", title, body, buttons = [] }) {
+        const overlay = document.getElementById("modal-overlay");
+        const card = document.getElementById("modal-card");
 
-          if (j[i].isbooked) {
-            td.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
-            td.innerHTML = `
-                    <span class="relative z-10">${j[i].id}</span>
-                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                        Booked by: <span class="font-bold text-white ml-1">${j[i].name}</span>
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
-                    </div>
-                `;
-          } else {
-            td.className = `${baseClasses} bg-emerald-500 text-white border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] cursor-pointer hover:bg-emerald-400 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(16,185,129,0.5)] active:scale-95 active:shadow-[0_0_10px_rgba(16,185,129,0.3)]`;
-            td.innerHTML = `<span class="relative z-10">${j[i].id}</span>`;
-          }
+        card.classList.remove("closing");
 
-          td.addEventListener("click", async function (e) {
-            const currentTd = e.currentTarget;
-            if (currentTd.classList.contains("cursor-not-allowed")) {
-              return; // Seat is already taken
-            }
+        document.getElementById("modal-icon").className = `modal-icon ${type}`;
+        document.getElementById("modal-icon").textContent = ICONS[type];
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = body;
 
-            try {
-              const id = j[i].id; // Safe from loop closure
-              const name = prompt("Enter your name");
-              if (!name) return;
+        const actionsEl = document.getElementById("modal-actions");
+        actionsEl.innerHTML = "";
+        buttons.forEach(({ label, className, onClick }) => {
+          const btn = document.createElement("button");
+          btn.className = `modal-btn ${className}`;
+          btn.textContent = label;
+          btn.onclick = () => {
+            closeModal();
+            onClick && onClick();
+          };
+          actionsEl.appendChild(btn);
+        });
 
-              const res = await fetch(`/${id}/${name}`, { method: "PUT" });
-              const data = await res.json();
+        overlay.classList.add("open");
+      }
 
-              if (data.error) {
-                alert("FAILED! Couldn't book! already booked.");
-              } else {
-                alert("Booked successfully!");
-                // Visually transition to booked state upon success
-                currentTd.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
-                currentTd.innerHTML = `
-                            <span class="relative z-10">${id}</span>
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                                Booked by: <span class="font-bold text-white ml-1">${name}</span>
-                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
-                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
-                            </div>
-                        `;
-              }
-            } catch (ex) {
-              alert("error booking " + ex);
-            }
-          });
-          tr.appendChild(td);
-          tbl.appendChild(tr);
+      function closeModal() {
+        const overlay = document.getElementById("modal-overlay");
+        const card = document.getElementById("modal-card");
+        card.classList.add("closing");
+        setTimeout(() => overlay.classList.remove("open"), 500);
+      }
+
+      // Close on backdrop click
+      document
+        .getElementById("modal-overlay")
+        .addEventListener("click", (e) => {
+          if (e.target === document.getElementById("modal-overlay"))
+            closeModal();
+        });
+
+      function showError(message) {
+        openModal({
+          type: "error",
+          title: "Oops! Something went wrong",
+          body: `<span>${message}</span>`,
+          buttons: [
+            { label: "Got it", className: "modal-btn-primary", onClick: null },
+          ],
+        });
+      }
+
+      function showSuccess(message) {
+        openModal({
+          type: "success",
+          title: "Success!",
+          body: `<span>${message}</span>`,
+          buttons: [
+            { label: "Great!", className: "modal-btn-primary", onClick: null },
+          ],
+        });
+      }
+
+      function showBookingConfirm(seatId, onConfirm) {
+        const authData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const userName = authData?.user?.name || "You";
+
+        openModal({
+          type: "confirm",
+          title: "Confirm Your Booking",
+          body: `
+            <div class="confirm-detail">
+              <div class="confirm-detail-icon">🎬</div>
+              <div>
+                <div class="confirm-detail-label">Movie</div>
+                <div class="confirm-detail-value">Dhurandhar The Revenge</div>
+              </div>
+            </div>
+            <div class="confirm-detail">
+              <div class="confirm-detail-icon">💺</div>
+              <div>
+                <div class="confirm-detail-label">Seat Number</div>
+                <div class="confirm-detail-value">#${seatId}</div>
+              </div>
+            </div>
+            <div class="confirm-detail">
+              <div class="confirm-detail-icon">👤</div>
+              <div>
+                <div class="confirm-detail-label">Booked for</div>
+                <div class="confirm-detail-value">${userName}</div>
+              </div>
+            </div>
+            <p style="font-size:0.8rem;color:rgba(157,136,194,0.6);margin-top:0.5rem;">This action cannot be undone once confirmed.</p>
+          `,
+          buttons: [
+            {
+              label: "Cancel",
+              className: "modal-btn-secondary",
+              onClick: null,
+            },
+            {
+              label: "🎟️ Book Now",
+              className: "modal-btn-primary",
+              onClick: onConfirm,
+            },
+          ],
+        });
+      }
+
+      function showBookingSuccess(seatId) {
+        const authData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const userName = authData?.user?.name || "You";
+
+        openModal({
+          type: "success",
+          title: "🎉 Booking Confirmed!",
+          body: `
+            <div class="confirm-detail" style="margin-bottom:0.75rem;">
+              <div class="confirm-detail-icon">💺</div>
+              <div>
+                <div class="confirm-detail-label">Your Seat</div>
+                <div class="confirm-detail-value shimmer-text">#${seatId}</div>
+              </div>
+            </div>
+            <p style="margin-top:0.5rem;">Enjoy the show, <strong style="color:#c084fc;">${userName}</strong>! 🍿<br/>
+            <span style="font-size:0.8rem;color:rgba(157,136,194,0.5);">Dhurandhar The Revenge is waiting for you.</span></p>
+          `,
+          buttons: [
+            {
+              label: "🎬 Awesome!",
+              className: "modal-btn-primary",
+              onClick: null,
+            },
+          ],
+        });
+      }
+
+      /* ══════════════════════════════════════════════════
+         TOOLTIP (using fixed positioning to avoid clipping)
+      ══════════════════════════════════════════════════ */
+      const tooltip = document.getElementById("global-tooltip");
+      let tooltipTimeout;
+
+      function showTooltip(targetEl, text) {
+        clearTimeout(tooltipTimeout);
+        tooltip.textContent = text;
+        tooltip.classList.add("visible");
+        positionTooltip(targetEl);
+      }
+
+      function positionTooltip(targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        const ttW = tooltip.offsetWidth || 160;
+        const ttH = tooltip.offsetHeight || 36;
+
+        let left = rect.left + rect.width / 2 - ttW / 2;
+        let top = rect.top - ttH - 10;
+
+        // keep inside viewport
+        if (left < 8) left = 8;
+        if (left + ttW > window.innerWidth - 8)
+          left = window.innerWidth - ttW - 8;
+        if (top < 8) top = rect.bottom + 10; // flip below if too high
+
+        tooltip.style.left = left + "px";
+        tooltip.style.top = top + "px";
+      }
+
+      function hideTooltip() {
+        tooltipTimeout = setTimeout(
+          () => tooltip.classList.remove("visible"),
+          80,
+        );
+      }
+
+      /* ══════════════════════════════════════════════════
+         AUTH FORMS
+      ══════════════════════════════════════════════════ */
+      document.addEventListener("DOMContentLoaded", () => {
+        const authData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (authData && authData.accessToken) {
+          showCinema(authData);
+        }
+      });
+
+      function switchAuth(type) {
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+        const authTitle = document.getElementById("auth-title");
+
+        if (type === "register") {
+          loginForm.style.opacity = "0";
+          loginForm.style.transform = "translateY(-12px)";
+          setTimeout(() => {
+            loginForm.style.display = "none";
+            loginForm.style.opacity = "";
+            loginForm.style.transform = "";
+            registerForm.classList.remove("hidden-content");
+            registerForm.style.display = "block";
+            setTimeout(() => registerForm.classList.add("visible-content"), 10);
+          }, 300);
+          authTitle.innerText = "Join us for the ultimate cinema experience!";
+        } else {
+          registerForm.classList.remove("visible-content");
+          setTimeout(() => {
+            registerForm.style.display = "none";
+            registerForm.classList.add("hidden-content");
+            loginForm.style.display = "block";
+            setTimeout(() => {
+              loginForm.style.opacity = "1";
+              loginForm.style.transform = "translateY(0)";
+            }, 10);
+          }, 300);
+          authTitle.innerText = "Welcome back! Please login to continue.";
         }
       }
-      run();
+
+      /* ── Register ── */
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("register-btn");
+          const name = document.getElementById("reg-name").value.trim();
+          const email = document.getElementById("reg-email").value.trim();
+          const password = document.getElementById("reg-password").value;
+
+          btn.disabled = true;
+          btn.textContent = "Creating account…";
+
+          try {
+            const res = await fetch(`${API_BASE}/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, email, password }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              openModal({
+                type: "success",
+                title: "Account Created!",
+                body: "Your account has been created successfully. Please log in to continue.",
+                buttons: [
+                  {
+                    label: "Go to Login",
+                    className: "modal-btn-primary",
+                    onClick: () => switchAuth("login"),
+                  },
+                ],
+              });
+              e.target.reset();
+            } else {
+              showError(
+                data.message || "Registration failed. Please try again.",
+              );
+            }
+          } catch {
+            showError(
+              "Connection error. Please check your network and try again.",
+            );
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Create Account";
+          }
+        });
+
+      /* ── Login ── */
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("login-btn");
+          const email = document.getElementById("login-email").value.trim();
+          const password = document.getElementById("login-password").value;
+
+          btn.disabled = true;
+          btn.textContent = "Logging in…";
+
+          try {
+            const res = await fetch(`${API_BASE}/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(data.data));
+              showCinema(data.data);
+            } else {
+              showError(
+                data.message || "Invalid credentials. Please try again.",
+              );
+            }
+          } catch {
+            showError(
+              "Connection error. Please check your network and try again.",
+            );
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Login";
+          }
+        });
+
+      /* ══════════════════════════════════════════════════
+         SHOW CINEMA
+      ══════════════════════════════════════════════════ */
+      function showCinema(authData) {
+        document.getElementById("auth-gate").style.display = "none";
+        const cinemaView = document.getElementById("cinema-view");
+        document.getElementById("user-welcome").textContent =
+          `Welcome back, ${authData.user.name} 👋`;
+        cinemaView.style.display = "block";
+        setTimeout(() => cinemaView.classList.add("visible-content"), 10);
+        renderSeats();
+      }
+
+      function logout() {
+        openModal({
+          type: "confirm",
+          title: "Logging Out",
+          body: "Are you sure you want to log out of ChaiCode Cinema?",
+          buttons: [
+            { label: "Stay", className: "modal-btn-secondary", onClick: null },
+            {
+              label: "Logout",
+              className: "modal-btn-primary",
+              onClick: () => {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+              },
+            },
+          ],
+        });
+      }
+
+      /* ══════════════════════════════════════════════════
+         RENDER SEATS
+      ══════════════════════════════════════════════════ */
+      async function renderSeats() {
+        const tbl = document.getElementById("tbl");
+        const loading = document.getElementById("seats-loading");
+        tbl.style.display = "none";
+        loading.style.display = "block";
+        tbl.innerHTML = "";
+
+        try {
+          const res = await fetch("/seats");
+          const data = await res.json();
+          const seats = data.sort((a, b) => a.id - b.id);
+
+          const seatsPerRow = 5;
+          let tr;
+
+          seats.forEach((seat, i) => {
+            if (i % seatsPerRow === 0) {
+              tr = document.createElement("tr");
+              tbl.appendChild(tr);
+            }
+
+            const td = document.createElement("td");
+            td.style.padding = "0";
+
+            const div = document.createElement("div");
+            div.className = `seat ${seat.isbooked ? "seat-booked has-tooltip" : "seat-available"}`;
+            div.textContent = seat.id;
+            div.setAttribute(
+              "aria-label",
+              seat.isbooked
+                ? `Seat ${seat.id} – Already Booked`
+                : `Seat ${seat.id} – Available, click to book`,
+            );
+
+            if (seat.isbooked) {
+              const bookedBy = seat.name || "Someone";
+              const tipText = `🔒 Taken by`;
+              div.title = `Seat #${seat.id} is already booked`;
+              div.addEventListener("mouseenter", () =>
+                showTooltip(div, tipText),
+              );
+              div.addEventListener("mousemove", () => positionTooltip(div));
+              div.addEventListener("mouseleave", hideTooltip);
+            } else {
+              div.addEventListener("click", () => bookSeat(seat.id));
+            }
+
+            td.appendChild(div);
+            tr.appendChild(td);
+          });
+
+          // Update count
+          const available = seats.filter((s) => !s.isbooked).length;
+          document.getElementById("available-count").textContent = available;
+
+          loading.style.display = "none";
+          tbl.style.display = "table";
+        } catch (err) {
+          console.error("Failed to load seats", err);
+          loading.innerHTML = `<p style="color:rgba(239,68,68,0.8);text-align:center;">Failed to load seats. <button onclick="renderSeats()" style="color:#c084fc;text-decoration:underline;background:none;border:none;cursor:pointer;">Retry</button></p>`;
+        }
+      }
+
+      /* ══════════════════════════════════════════════════
+         BOOK SEAT
+      ══════════════════════════════════════════════════ */
+      async function bookSeat(id) {
+        showBookingConfirm(id, async () => {
+          const authData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          try {
+            const res = await fetch(`/seats/book/${id}`, {
+              method: "PUT",
+              headers: { Authorization: `Bearer ${authData.accessToken}` },
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+              await renderSeats();
+              showBookingSuccess(id);
+            } else {
+              showError(
+                data.error ||
+                  data.message ||
+                  "Booking failed. The seat may already be taken.",
+              );
+            }
+          } catch {
+            showError("Connection error. Please try again.");
+          }
+        });
+      }
     </script>
   </body>
 </html>

@@ -30,15 +30,22 @@ export const initDB = async () => {
     const seatsTableQuery = `
     CREATE TABLE IF NOT EXISTS seats (
       id SERIAL PRIMARY KEY,
-      name VARCHAR(255),
+      user_id INT REFERENCES users(id),
       isbooked INT DEFAULT 0
     );`;
     await pool.query(seatsTableQuery);
 
+    // Ensure the column exists for existing tables
+    await pool.query(
+      "ALTER TABLE seats ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id)",
+    );
+
     // ৩. Seats if table is empty then insert 20 rows
     const checkSeats = await pool.query("SELECT COUNT(*) FROM seats");
     if (parseInt(checkSeats.rows[0].count) === 0) {
-      await pool.query("INSERT INTO seats (isbooked) SELECT 0 FROM generate_series(1, 20)");
+      await pool.query(
+        "INSERT INTO seats (isbooked) SELECT 0 FROM generate_series(1, 60)",
+      );
     }
 
     console.log("Database tables initialized successfully!");
